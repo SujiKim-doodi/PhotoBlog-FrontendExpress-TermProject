@@ -103,6 +103,53 @@
         width: 60%;
         height: 100%;
       }
+
+      .buttonContainer {
+        display: flex; /* Flexbox 사용 */
+        border: 2px solid gray;
+        background-color: ivory;
+      }
+
+      .buttonContainer button {
+        background-color: ivory; /* 버튼 배경색 */
+        border: 1px solid gray; /* 검정색 테두리 */ 
+        color: gray; /* 텍스트 색상 */
+        padding: 15px 32px; /* 안쪽 여백 */
+        text-align: center; /* 텍스트 가운데 정렬 */
+        text-decoration: none; /* 밑줄 없음 */
+        font-size: 16px; /* 폰트 크기 */
+        margin: 4px; /* 마진 */
+        cursor: pointer; /* 커서 포인터로 변경 */
+        border-radius: 10px; /* 테두리 반경 */
+      }
+
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .searchForm{
+        display: flex;
+      }
+
+      .searchForm button {
+        padding: 10px 20px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-left: 5px;
+      }
+
+      .searchForm input[type="text"] {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+
+
     </style>
   </head>
 
@@ -111,6 +158,17 @@
     <header>
       <h1>myPhotoBlog</h1>
     </header>
+    <div class="header">
+      <form class="searchForm" action="https://example.com/search" method="GET">
+        <input type="text" name="q" placeholder="검색어를 입력하세요">
+        <button type="submit">검색</button>
+      </form>
+      <div class="buttonContainer">
+        <button class="buttonHome">Home</button>
+        <button class="buttonAbout">About</button>
+        <button class="buttonContact">Contact</button>
+      </div>
+    </div>
     <aside>
       <ul>
         <li>
@@ -138,7 +196,7 @@
       <div class="box" id="creator" onclick="openModal2()">글 쓰기</div>
     </section>
     <!-- modal 형성!! (2개 생성함) -->
-    <div class="modal" id="myModal">
+    <div class="modal" id="myModal">  
       <div class="modal-content">
         <iframe
           id="modalFrame"
@@ -184,6 +242,17 @@
           modal2.style.display = "none";
         }
       };
+
+      //go home, about, contact (어디로 갈지 논의해봅시다)
+      function goHome() {
+        window.location.href = "https://www.naver.com";
+      }
+      function goAbout() {
+        window.location.href = "https://www.naver.com";
+      }
+      function goContact() {
+        window.location.href = "https://www.google.com";
+      }
     </script>
   </body>
 </html>
