@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>page3</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        display: grid;
+        grid-template-columns: 1fr 200px;
+        grid-template-rows: auto;
+        grid-template-areas:
+          "main sidebar"
+          "footer footer";
+        min-height: 100vh;
+      }
+      main {
+        padding: 20px;
+        grid-area: main;
+      }
+      footer {
+        background-color: #333;
+        color: white;
+        padding: 10px;
+        text-align: center;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+      }
+      aside {
+        padding: 50px;
+        grid-area: sidebar;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: fixed;
+        top: 0;
+        height: 100%;
+        right: 0;
+      }
+      .sidebar-button {
+        margin-bottom: 0;
+        padding: 15px 30px;
+        background-color: transparent;
+        border: 1px solid #333;
+        color: #333;
+        font-size: 16px;
+        transition: background-color 0.3s, color 0.3s;
+      }
+      #view {
+        background-color: #333;
+        color: white;
+      }
+      .sidebar-button:hover {
+        background-color: #333;
+        color: white;
+      }
+
+      .content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        max-width: 600px;
+        margin: 0 auto;
+      }
+      .content img {
+        width: 400px;
+        height: 300px;
+        height: auto;
+        margin-top: 20px;
+      }
+      .description {
+        text-align: left;
+        margin-top: 15px;
+      }
+      .description h3 {
+        margin-bottom: 10px;
+      }
+      .description p {
+        margin-bottom: 5px;
+      }
+
+      /* modal창 관련 스타일링 */
+      .modal {
+        display: none; /* 기본적으로는 숨김 처리 */
+        position: fixed; /* 화면에 고정 */
+        z-index: 1; /* 다른 요소들 위에 표시 */
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+      }
+
+      .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto; /* 모달을 수직 가운데로 정렬 */
+        padding: 20px;
+        border: 1px solid #888;
+        width: 30%;
+        max-width: 350px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 그림자 추가 */
+        text-align: center;
+      }
+      .close {
+        color: #aaa;
+        float: right;
+        font-size: 24px;
+        font-weight: bold;
+        cursor: pointer;
+      }
+      .close:hover,
+      .close:focus {
+        color: #333;
+        text-decoration: none;
+      }
+      #confirmDeleteButton {
+        background-color: #333333da; /* 배경색 설정 */
+        color: white; /* 텍스트 색상 설정 */
+        border: none; /* 테두리 제거 */
+        padding: 10px 20px; /* 내부 여백 설정 */
+        text-align: center; /* 텍스트 가운데 정렬 */
+        display: inline-block;
+        font-size: 16px;
+        margin-top: 10px; /* 버튼 위쪽 여백 추가 */
+        cursor: pointer; /* 마우스 커서 모양 변경 */
+        transition: background-color 0.3s; /* 호버 효과를 위한 전환 효과 추가 */
+      }
+      #confirmDeleteButton:hover {
+        background-color: #333;
+      }
+      #cancleButton {
+        background-color: #3333338f; /* 배경색 설정 */
+        color: white; /* 텍스트 색상 설정 */
+        border: none; /* 테두리 제거 */
+        padding: 10px 20px; /* 내부 여백 설정 */
+        text-align: center; /* 텍스트 가운데 정렬 */
+        display: inline-block;
+        font-size: 16px;
+        margin-top: 10px; /* 버튼 위쪽 여백 추가 */
+        cursor: pointer; /* 마우스 커서 모양 변경 */
+        transition: background-color 0.3s; /* 호버 효과를 위한 전환 효과 추가 */
+      }
+      #cancleButton:hover {
+        background-color: #333;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="content">
+        <img src="thumbnail.jpg" alt="이미지 설명" />
+        <div class="description">
+          <h3>위치: 서울</h3>
+          <h3>제목: 반포한강공원</h3>
+          <p>
+            내용: 이곳은 서울의 아름다운 풍경을 담은 사진입니다. 푸른 하늘과
+            시원한 바람이 매력적입니다.
+          </p>
+          <p>평점: ★★★★☆</p>
+          <p>정보: #서울 #풍경 #한강</p>
+        </div>
+      </div>
+    </main>
+
+    <aside>
+      <button class="sidebar-button" id="view">보기</button>
+      <button class="sidebar-button" id="edit">수정</button>
+      <button class="sidebar-button" id="deleteButton">삭제</button>
+    </aside>
+
+    <!-- modal 형성 -->
+    <div class="modal" id="myModal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <p>이 글을 완전히 삭제하시겠습니까?</p>
+        <button id="confirmDeleteButton">삭제</button>
+        <button id="cancleButton">취소</button>
+      </div>
+    </div>
+    <div class="modal" id="myModal2">
+      <div class="modal2-content">
+        <iframe
+          id="modalFrame"
+          src="page2.html"
+          frameborder="0"
+          width="100%"
+          height="100%"
+        ></iframe>
+      </div>
+    </div>
+
+    <!-------------js----------------->
+    <script>
+      document
+        .getElementById("deleteButton")
+        .addEventListener("click", function () {
+          document.getElementById("myModal").style.display = "block";
+        });
+      // 모달 닫기 버튼 클릭 시 팝업창 닫기
+      document
+        .getElementsByClassName("close")[0]
+        .addEventListener("click", function () {
+          document.getElementById("myModal").style.display = "none";
+        });
+      // 확인 버튼 클릭 시 동작
+      document
+        .getElementById("confirmDeleteButton")
+        .addEventListener("click", function () {
+          // 삭제동작 추가 > DB에 정보 지우기
+          alert("삭제되었습니다.");
+          document.getElementById("myModal").style.display = "none";
+        });
+      // 취소 버튼 클릭 시 창 닫기
+      document
+        .getElementById("cancleButton")
+        .addEventListener("click", function () {
+          document.getElementById("myModal").style.display = "none";
+        });
+      //edit 버튼 누르면 page2 모달 띄우기
+      // document
+      //   .getElementsByID("edit")
+      //   .addEventListener("click", function () {
+      //     document.getElementById("myModal").style.display = "none";
+      //   });
+    </script>
+
+    <footer>
+      <p>여기에 뭘 적으면 좋을까요 닫기버튼?</p>
+    </footer>
+  </body>
+</html>
+
+<!-- page1에서 가져와야할 정보들임
+  <script>
+    // JavaScript를 사용하여 정보를 가져와서 표시하는 부분
+    window.onload = function () {
+      // 이미지 정보를 가져오는 함수 (예시)
+      function getImageInfo() {
+        // 서버에서 이미지 정보를 가져오는 AJAX 요청
+        // 서버 응답에 따라 아래 코드를 수정하여 이미지 정보를 표시합니다.
+        var imageSrc = "이미지_파일_경로.jpg";
+        document.getElementById("image").src = imageSrc;
+      }
+
+      // 설명 정보를 가져오는 함수 (예시)
+      function getDescriptionInfo() {
+        // 서버에서 설명 정보를 가져오는 AJAX 요청
+        // 서버 응답에 따라 아래 코드를 수정하여 설명 정보를 표시합니다.
+        var descriptionData = {
+          location: "서울",
+          title: "예쁜 풍경",
+          content:
+            "이곳은 서울의 아름다운 풍경을 담은 사진입니다. 푸른 하늘과 시원한 바람이 매력적입니다.",
+          rating: "★★★★☆",
+          tags: "#서울 #풍경 #여행",
+        };
+
+        var descriptionElement = document.getElementById("description");
+        descriptionElement.innerHTML =
+          "<h3>위치: " +
+          descriptionData.location +
+          "</h3>" +
+          "<h3>제목: " +
+          descriptionData.title +
+          "</h3>" +
+          "<p>내용: " +
+          descriptionData.content +
+          "</p>" +
+          "<p>평점: " +
+          descriptionData.rating +
+          "</p>" +
+          "<p>정보: " +
+          descriptionData.tags +
+          "</p>";
+      }
+
+      // 이미지 정보와 설명 정보를 가져와서 표시
+      getImageInfo();
+      getDescriptionInfo();
+    };
+  </script>
+-->
