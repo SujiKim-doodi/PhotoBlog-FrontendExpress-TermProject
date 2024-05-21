@@ -1,14 +1,17 @@
 [
   {
-    "username": "김수지",
-    "password": "suji"
+    "username": "kimkmin",
+    "password": "hellokyungmin",
+    "nickname": "으음"
   },
   {
-    "username": "김경민",
-    "password": "kmin"
+    "username": "kimsuji",
+    "password": "suji",
+    "nickname": "수지타산"
   },
   {
-    "username": "임형빈",
-    "password": "lim"
+    "username": "brobin",
+    "password": "limbro",
+    "nickname": "지존형빈"
   }
 ]

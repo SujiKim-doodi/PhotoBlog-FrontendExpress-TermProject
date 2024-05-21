@@ -72,7 +72,7 @@
                     const data = response.data;   // res가 data로 치환, signup.js에서 addUser가 성공했다면 success로 라벨링
                     if (data.success) {    // success라면 로그인 완료 메시지 띄움
                         message.style.color = 'green';
-                        message.textContent = 'Login successful!';
+                        message.textContent = `${data.nickname}님, 반갑습니다!`;;
                     } else {
                         message.style.color = 'red';
                         message.textContent = 'Login failed: ' + data.message;

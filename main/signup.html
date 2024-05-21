@@ -49,6 +49,9 @@
             text-align: center;
             color: red;
         }
+        .hidden {
+            display: none;
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
@@ -57,31 +60,48 @@
         <h2>Sign Up</h2>
         <input type="text" id="username" placeholder="Username" required>
         <input type="password" id="password" placeholder="Password" required>
+        <input type="text" id="nickname" placeholder="Nickname" required>
         <button onclick="signUp()">Sign Up</button>  <!-- sign up 버튼을 누르면-->
         <div class="message" id="message"></div>
+        <button id="loginButton" class="hidden" onclick="redirectToLogin()">Login</button>
     </div>
 
     <script>
         function signUp() {
             const username = document.getElementById('username').value; // 입력한 id, pw를 가져오고 message 변수를 생성한다
             const password = document.getElementById('password').value;
+            const nickname = document.getElementById('nickname').value;
             const message = document.getElementById('message');
+            const loginButton = document.getElementById('loginButton');
 
-            axios.post('/signup', { username, password })  //post 요청 보내기
+            axios.post('/signup', { username, password, nickname })  //post 요청 보내기
                 .then(response => {
                     const data = response.data;  // res가 data로 치환, signup.js에서 addUser가 성공했다면 success로 라벨링
                     if (data.success) { // success라면 회원가입 완료 메시지 띄움
                         message.style.color = 'green';
-                        message.textContent = 'Sign up successful!';
+                        message.textContent = '회원가입이 완료됐습니다!';
+                        loginButton.classList.remove('hidden');  //로그인 버튼 나타남
                     } else {
                         message.style.color = 'red';
-                        message.textContent = 'Sign up failed: ' + data.message;
+                        message.textContent = data.message;
+
+                         // 중복된 값이 있을 경우 해당 input 필드 비우기
+                         if (data.field === 'username') {
+                            document.getElementById('username').value = '';
+                        }
+                        if (data.field === 'nickname') {
+                            document.getElementById('nickname').value = '';
+                        }
                     }
                 })
                 .catch(error => {
                     message.style.color = 'red';
                     message.textContent = 'Error: ' + error.message;
                 });
+        }
+
+        function redirectToLogin() {
+            window.location.href = 'login.html';
         }
     </script>
 </body>

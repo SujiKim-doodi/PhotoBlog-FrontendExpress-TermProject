@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const { addUser, findUser } = require('./fileUtils');
+const { addUser, findUser, isUsernameTaken, isNicknameTaken } = require('./fileUtils');
 
 const app = express();
 const port = 3000;
@@ -14,11 +14,19 @@ app.get('/', (req, res) => {  //시작하면 로그인 or 회원가입 페이지
 
 
 app.post('/signup', (req, res) => {    //회원가입 요청
-    const { username, password } = req.body;
+    const { username, password, nickname } = req.body;
+
+    if (isUsernameTaken(username)) {
+        return res.json({ success: false, field: 'username', message: '아이디가 중복됐습니다. 다시 입력해 주세요.' });
+    }
+
+    if (isNicknameTaken(nickname)) {
+        return res.json({ success: false, field: 'nickname', message: '닉네임이 중복됐습니다. 다시 입력해 주세요.' });
+    }
 
     try {
         // 사용자 정보 파일에 추가, addUser는 fileUtils에서 확인 가능
-        addUser(username, password);
+        addUser(username, password, nickname);
         res.json({ success: true });
     } catch (error) {
         console.error('Error signing up user:', error);
@@ -33,7 +41,7 @@ app.post('/login', (req, res) => {        //로그인 요청
     try {
         const user = findUser(username, password);  // finduser함수가 user가 있으면 ture return, 없으면 false return 해줄것임
         if (user) {
-            res.json({ success: true });  //success 상태의 respond 설정
+            res.json({ success: true, nickname: user.nickname });  //success 상태의 respond 설정
         } else {
             res.json({ success: false, message: 'Invalid username or password' });
         }

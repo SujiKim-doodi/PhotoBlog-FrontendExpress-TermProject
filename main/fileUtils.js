@@ -17,9 +17,9 @@ function saveUsers(users) {
     fs.writeFileSync(usersFilePath, data); //유저 정보가 저장된 파일에 저장한당
 }
 
-function addUser(username, password) {    //회원가입 기능에서 최종적으로 요청되는 것
+function addUser(username, password, nickname) {    //회원가입 기능에서 최종적으로 요청되는 것
     const users = loadUsers();            //users 변수를 통해 현재 가입된 uesr들의 정보를 가져옴
-    users.push({ username, password });   //지금 users(유저가 다 몰려있는 변수)에 새로운 유저를 추가시킴
+    users.push({ username, password, nickname});   //지금 users(유저가 다 몰려있는 변수)에 새로운 유저를 추가시킴
     saveUsers(users);                     //파일에 완전 저장 -> users에는 반영이 돼 있지만, file에는 저장이 안돼있기 때문에 이를 통해 저장한다.
 }
 
@@ -30,4 +30,26 @@ function findUser(username, password) {
                                                                                           //일치하는 사용자를 찾아 반환함 -> 있으면 true
 }
 
-module.exports = { addUser, loadUsers, saveUsers, findUser }; //함수를 내보낸다.
+function isUsernameTaken(username) {
+    const users = loadUsers();
+    return users.some(user => user.username === username);
+}
+
+function isNicknameTaken(nickname) {
+    const users = loadUsers();
+    return users.some(user => user.nickname === nickname);
+}
+
+
+// 여기서부턴 확실하지 않음
+function loadPosts() {
+    try {
+        const data = fs.readFileSync(postsFilePath, 'utf8');
+        return JSON.parse(data);
+    } catch (error) {
+        console.error('Error loading posts:', error);
+        return { users: [] };
+    }
+}
+
+module.exports = { addUser, loadUsers, saveUsers, findUser, isUsernameTaken, isNicknameTaken }; //함수를 내보낸다.
