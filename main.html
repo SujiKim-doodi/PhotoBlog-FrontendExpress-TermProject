@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>myPhotoBlog</title>
+    <style>
+      /* CSS 스타일링 */
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+      }
+      header {
+        color: #333;
+        padding: 20px;
+        text-align: center;
+      }
+      aside {
+        padding: 10px;
+        float: left; /* 왼쪽으로 이동 */
+      }
+      aside ul {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+        display: flex; /* 세로 배치 */
+        flex-direction: column;
+      }
+      aside ul li {
+        margin-bottom: 5px; /* 아이템 간격 */
+      }
+      aside ul li a {
+        color: #333;
+        text-decoration: none;
+      }
+      aside ul li ul {
+        display: none; /* 하위 메뉴 감춤 */
+        padding-left: 15px; /* 들여쓰기 */
+      }
+      aside ul li:hover ul {
+        display: block; /* 호버 시 하위 메뉴 표시 */
+      }
+      section {
+        padding: 20px;
+        margin: 20px;
+        background-color: #fff;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr); /* 3개의 열을 가진 그리드 */
+        gap: 20px;
+      }
+      .box {
+        width: 150px;
+        height: 150px;
+        background-color: #ddd;
+        padding: 20px;
+        cursor: pointer;
+      }
+      .box:hover {
+        background-color: #b3b2b2;
+      }
+      #creator {
+        background-color: whitesmoke;
+        text-align: center;
+      }
+      /* 모달 스타일링 */
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.4);
+      }
+      .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 60%;
+        height: 100%;
+      }
+      .modal2 {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.4);
+      }
+      .modal2-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 60%;
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- HTML 레이아웃 -->
+    <header>
+      <h1>myPhotoBlog</h1>
+    </header>
+    <aside>
+      <ul>
+        <li>
+          <a href="#">국내 여행 리스트</a>
+          <ul>
+            <!-- 카테고리 추가하면됨 -->
+          </ul>
+        </li>
+        <li>
+          <a href="#">해외 여행 리스트</a>
+          <ul>
+            <!-- 카테고리 추가하면됨 -->
+          </ul>
+        </li>
+      </ul>
+    </aside>
+    <section id="posts-container">
+      <!-- 게시물 목록이 동적으로 로드됩니다 -->
+    </section>
+    <button onclick="openModal2()">Create New Post</button>
+
+    <!-- 모달 형성 -->
+    <div class="modal" id="myModal">
+      <div class="modal-content">
+        <iframe
+          id="modalFrame"
+          src="view.html"
+          frameborder="0"
+          width="100%"
+          height="100%"
+        ></iframe>
+      </div>
+    </div>
+    <div class="modal2" id="myModal2">
+      <div class="modal2-content">
+        <iframe
+          id="modalFrame2"
+          src="post.html"
+          frameborder="0"
+          width="100%"
+          height="100%"
+        ></iframe>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
