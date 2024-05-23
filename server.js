@@ -173,7 +173,18 @@ app.post('/login', (req, res) => {
         res.status(500).json({ success: false, message: 'Server error' });
     }
 });
+// 로그인한 사용자의 게시물 삭제
+app.delete('/api/posts/user/:username', (req, res) => {
+    let posts = readData();
+    const username = req.params.username;
+    posts = posts.filter(p => p.author !== username);
+    writeData(posts);
+    res.json({ success: true });
+});
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
+
+
+

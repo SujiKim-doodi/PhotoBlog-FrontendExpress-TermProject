@@ -123,3 +123,19 @@ function submitForm() {
     })
     .catch((error) => console.error("Error:", error));
 }
+
+function deleteAllPosts() {
+  const username = sessionStorage.getItem("username");
+
+  fetch(`/api/posts/user/${username}`, {
+      method: 'DELETE'
+  })
+  .then(res => res.json())
+  .then(() => {
+      alert('All your posts have been deleted.');
+      window.location.reload();
+  })
+  .catch(error => console.error('Error:', error));
+}
+
+
