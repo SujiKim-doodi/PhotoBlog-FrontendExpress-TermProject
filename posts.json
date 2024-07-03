@@ -1,0 +1,86 @@
+[
+  {
+    "id": 1717080521031,
+    "title": "Osaka",
+    "content": "글리코상 별거 없다",
+    "rating": "2",
+    "location": "도톤보리 글리코 사인",
+    "country": "일본",
+    "region": "Osaka",
+    "author": "brobin",
+    "createdAt": "2024-05-30T14:48:40.860Z",
+    "image": "1717080520872-309907475-KakaoTalk_20240530_225826489.jpg"
+  },
+  {
+    "id": 1717080565316,
+    "title": "서울 복귀",
+    "content": "강원도는 정말 춥다. 빨리 돌아가자..",
+    "rating": "4",
+    "location": "평창군",
+    "country": "대한민국",
+    "region": "강원도",
+    "author": "brobin",
+    "createdAt": "2024-05-30T14:49:25.240Z",
+    "image": "1717080565250-308463480-KakaoTalk_20240530_225841214.jpg"
+  },
+  {
+    "id": 1717080594140,
+    "title": "태국",
+    "content": "태국에는 사원이 정말 많다. 그리고 덥다. ",
+    "rating": "3",
+    "location": "사원",
+    "country": "태국",
+    "region": "Samut Sakhon",
+    "author": "brobin",
+    "createdAt": "2024-05-30T14:49:54.118Z",
+    "image": "1717080594132-580289076-KakaoTalk_20240530_230628765.jpg"
+  },
+  {
+    "id": 1717080661456,
+    "title": "서울의 향기",
+    "content": "정겹다..",
+    "rating": "4",
+    "location": "종로구",
+    "country": "대한민국",
+    "region": "서울특별시",
+    "author": "brobin",
+    "createdAt": "2024-05-30T14:51:01.422Z",
+    "image": "1717080661431-568614757-KakaoTalk_20240530_230707084.jpg"
+  },
+  {
+    "id": 1717080690543,
+    "title": "필리핀!!",
+    "content": "또 가고 싶어..",
+    "rating": "5",
+    "location": "세부 시티",
+    "country": "필리핀",
+    "region": "센트럴 비사야",
+    "author": "brobin",
+    "createdAt": "2024-05-30T14:51:30.504Z",
+    "image": "1717080690516-343902035-KakaoTalk_20240530_230628765_01.jpg"
+  },
+  {
+    "id": 1717221023078,
+    "title": "빵먹는방구ㅏㅣ",
+    "content": "빵상",
+    "rating": "5",
+    "location": "서울김포공항",
+    "country": "대한민국",
+    "region": "서울특별시",
+    "author": "suasuasua03",
+    "createdAt": "2024-06-01T05:50:23.006Z",
+    "image": "1717221023031-110883139-DSC07371.JPG"
+  },
+  {
+    "id": 1717221066341,
+    "title": "111",
+    "content": "1111",
+    "rating": "3",
+    "location": "오사카시",
+    "country": "일본",
+    "region": "오사카부",
+    "author": "suasuasua03",
+    "createdAt": "2024-06-01T05:51:06.290Z",
+    "image": "1717221066296-594888735-DSC07436.JPG"
+  }
+]

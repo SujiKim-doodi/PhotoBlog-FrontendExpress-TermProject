@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>post</title>
+    <link rel="stylesheet" href="post.css" />
+  </head>
+  <body>
+    <div class="content">
+      <div class="imgbox" onclick="openFileInput()">클릭하여 이미지 추가</div>
+      <form id="descriptionForm">
+        <label for="location">🌏위치</label>
+        <input
+          type="text"
+          id="locationInput"
+          placeholder="어디서 찍은 사진인가요?"
+          readonly
+          onclick="openModal()"
+        /><br /><br />
+        <div id="result" style="color: gray; font-size: 0.9em"></div>
+        <label for="title">✏제목</label>
+        <input type="text" id="title" name="title" /><br /><br />
+        <label for="content">📝내용</label>
+        <textarea id="content" name="content"></textarea><br /><br />
+        <label for="rating">⭐평점</label>
+        <div class="star-rating" data-rating="0">
+          <span class="star" data-value="1">&#9733;</span>
+          <span class="star" data-value="2">&#9733;</span>
+          <span class="star" data-value="3">&#9733;</span>
+          <span class="star" data-value="4">&#9733;</span>
+          <span class="star" data-value="5">&#9733;</span>
+        </div>
+        <br /><br />
+        <input type="file" id="fileInput" style="display: none" />
+        <button type="button" onclick="submitForm()">저장</button>
+      </form>
+      <div class="description" id="descriptionOutput"></div>
+    </div>
+
+    <!-- 모달 요소 추가 -->
+    <div id="myModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <input
+          id="modalLocationInput"
+          type="text"
+          placeholder="장소를 입력하세요"
+          style="width: 100%"
+          oninput="searchInModal()"
+        />
+        <div id="map" style="height: 70%; width: 100%"></div>
+        <button onclick="saveLocation()">저장</button>
+      </div>
+    </div>
+
+    <script>
+      function openFileInput() {
+        var fileInput = document.getElementById("fileInput");
+        fileInput.click();
+        fileInput.addEventListener("change", function () {
+          var file = fileInput.files[0];
+          var reader = new FileReader();
+          reader.onload = function (event) {
+            var fileContent = event.target.result;
+            displayImage(fileContent);
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+
+      function displayImage(dataURL) {
+        var box = document.querySelector(".imgbox");
+        box.innerHTML = '<img src="' + dataURL + '" alt="Selected Image">';
+      }
+
+      function submitForm() {
+        var title = document.getElementById("title").value;
+        var content = document.getElementById("content").value;
+        var rating = document
+          .querySelector(".star-rating")
+          .getAttribute("data-rating");
+        var location = document.getElementById("locationInput").value;
+        var author = sessionStorage.getItem("username");
+
+        if (title.length < 1 || title.length > 10) {
+          alert("제목은 1자에서 10자 사이여야 합니다.");
+          return;
+        }
+
+        const locationDetails = document.getElementById("result").innerText;
+        const [country, region] = locationDetails
+          .split(" , ")
+          .map((s) => s.trim());
+
+        const formData = new FormData();
+        formData.append("title", title);
+        formData.append("content", content);
+        formData.append("rating", rating);
+        formData.append("location", location);
+        formData.append("country", country);
+        formData.append("region", region);
+        formData.append("author", author);
+        formData.append("createdAt", new Date().toISOString()); // 현재 날짜와 시간을 추가
+
+        const fileInput = document.getElementById("fileInput");
+        if (fileInput && fileInput.files.length > 0) {
+          formData.append("image", fileInput.files[0]);
+        }
+
+        fetch("/api/posts", {
+          method: "POST",
+          body: formData,
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            alert("저장되었습니다.");
+            window.parent.closeModal("myModal2");
+            window.parent.location.reload();
+          })
+          .catch((error) => console.error("Error:", error));
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        const stars = document.querySelectorAll(".star-rating .star");
+        stars.forEach(function (star) {
+          star.addEventListener("click", function () {
+            const rating = parseInt(star.getAttribute("data-value"));
+            const starRating = star.parentElement;
+            starRating.setAttribute("data-rating", rating);
+            stars.forEach(function (s) {
+              if (parseInt(s.getAttribute("data-value")) <= rating) {
+                s.classList.add("active");
+              } else {
+                s.classList.remove("active");
+              }
+            });
+          });
+        });
+      });
+
+      function openModal() {
+        document.getElementById("myModal").style.display = "block";
+        document.getElementById("modalLocationInput").value = ""; // 검색 필드 초기화
+        document.getElementById("modalLocationInput").placeholder =
+          "장소를 입력하세요"; // Placeholder 설정
+        initializeMap(); // 맵 초기화
+      }
+
+      function closeModal() {
+        document.getElementById("myModal").style.display = "none";
+      }
+
+      let selectedPlace = null; // 선택된 장소 저장
+
+      function initializeMap() {
+        const map = new google.maps.Map(document.getElementById("map"), {
+          center: { lat: -34.397, lng: 150.644 },
+          zoom: 8,
+        });
+
+        const input = document.getElementById("modalLocationInput");
+        const searchBox = new google.maps.places.SearchBox(input);
+        map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+
+        map.addListener("bounds_changed", () => {
+          searchBox.setBounds(map.getBounds());
+        });
+
+        let markers = [];
+
+        searchBox.addListener("places_changed", () => {
+          const places = searchBox.getPlaces();
+
+          if (places.length == 0) {
+            return;
+          }
+
+          markers.forEach((marker) => {
+            marker.setMap(null);
+          });
+          markers = [];
+
+          const bounds = new google.maps.LatLngBounds();
+          places.forEach((place) => {
+            if (!place.geometry || !place.geometry.location) {
+              console.log("Returned place contains no geometry");
+              return;
+            }
+            const icon = {
+              url: place.icon,
+              size: new google.maps.Size(71, 71),
+              origin: new google.maps.Point(0, 0),
+              anchor: new google.maps.Point(17, 34),
+              scaledSize: new google.maps.Size(25, 25),
+            };
+
+            markers.push(
+              new google.maps.Marker({
+                map,
+                icon,
+                title: place.name,
+                position: place.geometry.location,
+              })
+            );
+
+            if (place.geometry.viewport) {
+              bounds.union(place.geometry.viewport);
+            } else {
+              bounds.extend(place.geometry.location);
+            }
+
+            // 장소를 선택하면 위치 정보를 임시로 저장
+            selectedPlace = place;
+
+            const addressComponents = place.address_components;
+            let formattedAddress = "";
+            let country = "";
+            let region = "";
+            addressComponents.forEach((component) => {
+              if (component.types.includes("country")) {
+                country = component.long_name;
+              } else if (
+                component.types.includes("administrative_area_level_1")
+              ) {
+                region = component.long_name;
+              }
+            });
+            formattedAddress = `${country} ,  ${region}`;
+            document.getElementById("result").innerHTML = formattedAddress;
+          });
+          map.fitBounds(bounds);
+        });
+      }
+
+      function saveLocation() {
+        if (selectedPlace) {
+          document.getElementById("locationInput").value = selectedPlace.name;
+          closeModal();
+        }
+      }
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCXZvoycADDNbD6We-PdhRfamjOaE_HnSs&libraries=places"></script>
+  </body>
+</html>

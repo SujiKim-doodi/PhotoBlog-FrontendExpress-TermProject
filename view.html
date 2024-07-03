@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>View Post</title>
+    <link rel="stylesheet" href="view.css" />
+  </head>
+  <body>
+    <main>
+      <div class="content">
+        <img id="post-image" src="" alt="이미지 설명" />
+        <!-- 이미지 src를 동적으로 설정 -->
+        <div class="description">
+          <p id="post-location">위치:</p>
+          <!-- 위치를 동적으로 설정 -->
+          <h3 id="post-title">제목:</h3>
+          <!-- 제목을 동적으로 설정 -->
+          <p id="post-content"></p>
+          <!-- 내용을 동적으로 설정 -->
+          <p id="post-createdAt">작성 일자:</p>
+          <!-- 작성일자 설정 -->
+          <p id="post-rating">평점:</p>
+          <!-- 평점을 동적으로 설정 -->
+        </div>
+      </div>
+    </main>
+
+    <aside>
+      <button class="sidebar-button" id="editButton">수정</button>
+      <button class="sidebar-button" id="deleteButton">삭제</button>
+    </aside>
+
+    <!-- 삭제 확인 모달 -->
+    <div class="modal" id="deleteModal">
+      <div class="modal-content">
+        <span class="close" onclick="closeModal('deleteModal')">&times;</span>
+        <p>이 글을 완전히 삭제하시겠습니까?</p>
+        <button id="confirmDeleteButton">삭제</button>
+        <button id="cancelButton" onclick="closeModal('deleteModal')">
+          취소
+        </button>
+      </div>
+    </div>
+
+    <!-- js -->
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const postId = new URLSearchParams(window.location.search).get("id");
+
+        if (postId) {
+        fetch(`/api/posts/${postId}`)
+            .then((res) => res.json())
+            .then((post) => {
+                document.getElementById("post-title").textContent = `제목: ${post.title}`;
+                document.getElementById("post-content").textContent = `${post.content}`;
+                document.getElementById("post-location").textContent = `📍위치: ${post.country} , ${post.region}`;
+                document.getElementById("post-rating").textContent = `👍평점: ${post.rating}`;
+                document.getElementById("post-createdAt").textContent = `작성 일자: ${new Date(post.createdAt).toLocaleString()}`;
+                if (post.image) {
+                    document.getElementById("post-image").src = `/uploads/${post.image}`;
+                    document.getElementById("post-image").alt = post.title;
+                }
+            });
+        }
+
+        document.getElementById("editButton").addEventListener("click", () => {
+          window.location.href = `/edit.html?id=${postId}`; // edit.html로 이동
+        });
+
+        document
+          .getElementById("deleteButton")
+          .addEventListener("click", () => {
+            document.getElementById("deleteModal").style.display = "block";
+          });
+
+        document
+          .getElementById("confirmDeleteButton")
+          .addEventListener("click", () => {
+            fetch(`/api/posts/${postId}`, {
+              method: "DELETE",
+            })
+              .then((res) => res.json())
+              .then(() => {
+                alert("삭제되었습니다.");
+                closeModal("deleteModal");
+                window.parent.location.reload(); // 수정: 부모 페이지 새로고침
+              });
+          });
+        // ESC 키로 모달 닫기
+        document.addEventListener("keydown", function (event) {
+          if (event.key === "Escape") {
+            window.parent.postMessage("closeModal", "*");
+          }
+        });
+      });
+
+      function closeModal(modalId) {
+        document.getElementById(modalId).style.display = "none";
+      }
+    </script>
+  </body>
+</html>

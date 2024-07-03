@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>myPhotoBlog</title>
+    <link rel="stylesheet" href="main.css" />
+  </head>
+  <body>
+    <!-- HTML 레이아웃 -->
+    <div class="container">
+      <div class="header">
+        <h1 id="blogTitle" style="cursor: pointer">myPhotoBlog<br/>📷</h1>
+      </div>
+
+      <div class="menu">
+        <form id="searchForm">
+          <input
+            id="searchInput"
+            type="text"
+            placeholder="제목 검색"
+            autocomplete="off"
+          />
+        </form>
+      </div>
+
+      <div class="main" id="posts-container">
+        <!-- 게시물 목록이 동적으로 로드됩니다 -->
+      </div>
+
+      <div class="top">
+        <div id="userActions">
+          <div id="userNickname"></div>
+          <button id="logoutButton">로그아웃</button>
+        </div>
+        <button onclick="openModal2()">글 쓰기</button>
+        <button onclick="deleteAllPosts()">전체 삭제</button>
+      </div>
+
+      <div class="aside">
+        <ul>
+          <li>
+            <a href="#">국내 여행 리스트</a>
+            <ul id="domesticList">
+              <!-- 카테고리 추가됨 -->
+            </ul>
+          </li>
+          <li>
+            <a href="#">해외 여행 리스트</a>
+            <ul id="internationalList">
+              <!-- 카테고리 추가됨 -->
+            </ul>
+          </li>
+        </ul>
+      </div>
+      <div class="bottom"></div>
+      <div class="footer"></div>
+
+      <!-- 모달 형성 -->
+      <div class="modal" id="myModal">
+        <div class="modal-content">
+          <iframe
+            id="modalFrame"
+            src="view.html"
+            frameborder="0"
+            width="100%"
+            height="100%"
+          ></iframe>
+        </div>
+      </div>
+      <div class="modal2" id="myModal2">
+        <div class="modal2-content">
+          <iframe
+            id="modalFrame2"
+            src="post.html"
+            frameborder="0"
+            width="100%"
+            height="100%"
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <script src="main.js"></script>
+  </body>
+</html>

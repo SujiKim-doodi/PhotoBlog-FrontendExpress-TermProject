@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Edit Post</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      display: grid;
+      grid-template-columns: 1fr 200px;
+      grid-template-rows: auto;
+      grid-template-areas: "main sidebar" "footer footer";
+      min-height: 100vh;
+    }
+    main {
+      padding: 20px;
+      grid-area: main;
+    }
+    .imgbox {
+      width: 400px;
+      height: 300px;
+      background-color: whitesmoke;
+      border: 1px solid #000;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .imgbox img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: cover;
+    }
+    #descriptionForm {
+      display: inline-block;
+      margin: 10px;
+    }
+    #content {
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    .content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    form input,
+    form textarea,
+    form select {
+      width: 100%;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.4);
+    }
+    .modal-content {
+      background-color: #fefefe;
+      margin: 15% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+      height: 70%;
+    }
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .close:hover,
+    .close:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .star-rating {
+      font-size: 30px;
+    }
+    .star {
+      cursor: pointer;
+      color: gray;
+    }
+    .star:hover,
+    .star.hovered,
+    .star.active {
+      color: gold;
+    }
+  </style>
+</head>
+<body>
+<main>
+  <div class="content">
+    <div class="imgbox" onclick="openFileInput()"></div>
+    <form id="descriptionForm">
+      <label for="location">🌏위치</label>
+      <input
+        type="text"
+        id="locationInput"
+        name="location"
+        placeholder="장소를 입력하세요"
+        readonly
+        onclick="openModal()"
+      /><br />
+      <div id="result" style="color: gray; font-size: 0.9em"></div>
+      <label for="title">✏제목</label>
+      <input type="text" id="title" name="title" /><br />
+      <label for="content">📝내용</label>
+      <textarea id="content" name="content"></textarea><br /><br />
+      <label for="rating">⭐평점</label>
+      <div class="star-rating" data-rating="0">
+        <span class="star" data-value="1">&#9733;</span>
+        <span class="star" data-value="2">&#9733;</span>
+        <span class="star" data-value="3">&#9733;</span>
+        <span class="star" data-value="4">&#9733;</span>
+        <span class="star" data-value="5">&#9733;</span>
+      </div>
+      <input type="file" id="fileInput" style="display: none" />
+      <button type="button" onclick="submitForm()">수정</button>
+    </form>
+  </div>
+</main>
+
+<div id="myModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeModal()">&times;</span>
+    <input
+      id="modalLocationInput"
+      type="text"
+      placeholder="장소를 입력하세요"
+      style="width: 100%"
+      oninput="searchInModal()"
+    />
+    <div id="map" style="height: 70%; width: 100%"></div>
+    <button onclick="saveLocation()">저장</button>
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const postId = new URLSearchParams(window.location.search).get("id");
+  if (postId) {
+    fetch(`/api/posts/${postId}`)
+      .then((response) => response.json())
+      .then((data) => {
+        document.getElementById("title").value = data.title;
+        document.getElementById("content").value = data.content;
+        document.getElementById("locationInput").value = data.location;
+        document.getElementById("result").innerText = `${data.country} , ${data.region}`;
+        sessionStorage.setItem("username", data.author);
+
+        if (data.image) {
+          displayImage(`/uploads/${data.image}`);
+        }
+        const rating = parseInt(data.rating, 10);
+        const stars = document.querySelectorAll(".star-rating .star");
+        stars.forEach((star) => {
+          if (parseInt(star.getAttribute("data-value")) <= rating) {
+            star.classList.add("active");
+          }
+        });
+        document.querySelector(".star-rating").setAttribute("data-rating", rating);
+      });
+  }
+
+  const stars = document.querySelectorAll(".star-rating .star");
+  stars.forEach(function (star) {
+    star.addEventListener("click", function () {
+      const rating = parseInt(star.getAttribute("data-value"));
+      const starRating = star.parentElement;
+      starRating.setAttribute("data-rating", rating);
+      stars.forEach(function (s) {
+        if (parseInt(s.getAttribute("data-value")) <= rating) {
+          s.classList.add("active");
+        } else {
+          s.classList.remove("active");
+        }
+      });
+    });
+  });
+});
+
+function openFileInput() {
+  var fileInput = document.getElementById("fileInput");
+  fileInput.click();
+  fileInput.addEventListener("change", function () {
+    var file = fileInput.files[0];
+    var reader = new FileReader();
+    reader.onload = function (event) {
+      var fileContent = event.target.result;
+      displayImage(fileContent);
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function displayImage(dataURL) {
+  var box = document.querySelector(".imgbox");
+  box.innerHTML = '<img src="' + dataURL + '" alt="Selected Image">';
+}
+
+function openModal() {
+  document.getElementById("myModal").style.display = "block";
+  document.getElementById("modalLocationInput").value = "";
+  document.getElementById("modalLocationInput").placeholder = "장소를 입력하세요";
+  initializeMap();
+}
+
+function closeModal() {
+  document.getElementById("myModal").style.display = "none";
+}
+
+let selectedPlace = null;
+
+function initializeMap() {
+  const map = new google.maps.Map(document.getElementById("map"), {
+    center: { lat: -34.397, lng: 150.644 },
+    zoom: 8,
+  });
+
+  const input = document.getElementById("modalLocationInput");
+  const searchBox = new google.maps.places.SearchBox(input);
+  map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+
+  map.addListener("bounds_changed", () => {
+    searchBox.setBounds(map.getBounds());
+  });
+
+  let markers = [];
+
+  searchBox.addListener("places_changed", () => {
+    const places = searchBox.getPlaces();
+
+    if (places.length == 0) {
+      return;
+    }
+
+    markers.forEach((marker) => {
+      marker.setMap(null);
+    });
+    markers = [];
+
+    const bounds = new google.maps.LatLngBounds();
+    places.forEach((place) => {
+      if (!place.geometry || !place.geometry.location) {
+        console.log("Returned place contains no geometry");
+        return;
+      }
+      const icon = {
+        url: place.icon,
+        size: new google.maps.Size(71, 71),
+        origin: new google.maps.Point(0, 0),
+        anchor: new google.maps.Point(17, 34),
+        scaledSize: new google.maps.Size(25, 25),
+      };
+
+      markers.push(
+        new google.maps.Marker({
+          map,
+          icon,
+          title: place.name,
+          position: place.geometry.location,
+        })
+      );
+
+      if (place.geometry.viewport) {
+        bounds.union(place.geometry.viewport);
+      } else {
+        bounds.extend(place.geometry.location);
+      }
+
+      selectedPlace = place;
+
+      const addressComponents = place.address_components;
+      let formattedAddress = "";
+      let country = "";
+      let region = "";
+      addressComponents.forEach((component) => {
+        if (component.types.includes("country")) {
+          country = component.long_name;
+        } else if (component.types.includes("administrative_area_level_1")) {
+          region = component.long_name;
+        }
+      });
+      formattedAddress = `${country} ,  ${region}`;
+      document.getElementById("result").innerHTML = formattedAddress;
+    });
+    map.fitBounds(bounds);
+  });
+}
+
+function saveLocation() {
+  if (selectedPlace) {
+    document.getElementById("locationInput").value = selectedPlace.name;
+    closeModal();
+  }
+}
+
+function submitForm() {
+  const postId = new URLSearchParams(window.location.search).get("id");
+  const formData = new FormData();
+  formData.append("title", document.getElementById("title").value);
+  formData.append("content", document.getElementById("content").value);
+  formData.append("location", document.getElementById("locationInput").value);
+  formData.append("country", document.getElementById("result").innerText.split(" , ")[0].trim());
+  formData.append("region", document.getElementById("result").innerText.split(" , ")[1].trim());
+  formData.append("author", sessionStorage.getItem("username"));
+  formData.append("rating", document.querySelector(".star-rating").getAttribute("data-rating"));
+
+  const fileInput = document.getElementById("fileInput");
+  if (fileInput && fileInput.files.length > 0) {
+    formData.append("image", fileInput.files[0]);
+  }
+
+  fetch(`/api/posts/${postId}`, {
+    method: "PUT",
+    body: formData,
+  })
+  .then((response) => response.json())
+  .then((data) => {
+    console.log("Success:", data);
+    alert("게시글이 성공적으로 수정되었습니다.");
+    window.location.href = `/view.html?id=${postId}`;
+  })
+  .catch((error) => {
+    console.error("Error:", error);
+  });
+}
+</script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCXZvoycADDNbD6We-PdhRfamjOaE_HnSs&libraries=places"></script>
+</body>
+</html>
